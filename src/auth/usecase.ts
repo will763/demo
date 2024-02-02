@@ -1,6 +1,6 @@
 import { UserRepository } from "../user/interface";
 import { UserRepositoryPrisma } from "../user/repository";
-import { Login } from "./interface";
+import { signin, signup } from "./interface";
 
 class AuthUseCase {
     private userRepository: UserRepository;
@@ -8,7 +8,10 @@ class AuthUseCase {
       this.userRepository = new UserRepositoryPrisma();
     }
   
-    async login({ email, password }: Login) {
+    async signin({ email, password }: signin) {
+    }
+
+    async signup({ email, password, name }: signup) {
     }
 
   }
