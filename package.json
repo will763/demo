@@ -1,0 +1,26 @@
+{
+  "name": "backend-microservico-autenticacao",
+  "version": "1.0.0",
+  "description": "Backend do microservico de autenticacao",
+  "main": "index.js",
+  "type": "module",
+  "engines": {
+    "node": "20.11.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prisma": "^5.9.1",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.9.1",
+    "fastify": "^4.26.0"
+  }
+}
