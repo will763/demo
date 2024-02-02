@@ -10,6 +10,9 @@ class UserUseCase {
     async findAll() {
     }
 
+    async create(data:UserCreate) {
+    }
+
     async update(id:string, data: UserUpdate) {
     }
 
