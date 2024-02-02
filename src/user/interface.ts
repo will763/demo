@@ -1,5 +1,5 @@
 export interface User {
-    id: string;
+    id: number;
     email: string;
     name: string;
     password: string
@@ -18,9 +18,10 @@ export interface User {
   }
 
   export interface UserRepository {
+    create(data: UserCreate):Promise<String>;
+    findByEmail(email: string ): Promise<User | null>;
+    
     get(): Promise<Array<User>>;
-    create(data: UserCreate):Promise<User>;
     delete(id: string ): Promise<User>;
     update(id: string, data: UserUpdate): Promise<User>;
-    findByEmail(email: string ): Promise<User>;
   }

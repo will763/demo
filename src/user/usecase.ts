@@ -1,16 +1,26 @@
 import { UserCreate, UserRepository, UserUpdate } from "./interface";
 import { UserRepositoryPrisma } from "./repository";
 
+
 class UserUseCase {
     private userRepository: UserRepository;
     constructor() {
       this.userRepository = new UserRepositoryPrisma();
     }
   
-    async findAll() {
-    }
+    async create(data: UserCreate) {
+      const verifyUserExists = await this.userRepository.findByEmail(data.email)
+      if (verifyUserExists) {
+        throw new Error("User ja existe")
+      }
+      
+      await this.userRepository.create(data)
 
-    async create(data:UserCreate) {
+    }
+  
+
+
+    async findAll() {
     }
 
     async update(id:string, data: UserUpdate) {
