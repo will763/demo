@@ -1,4 +1,4 @@
-import { User, UserCreate, UserRepository, UserUpdate } from "./interface";
+import { UserCreate, UserRepository, UserUpdate } from "./interface";
 import { UserRepositoryPrisma } from "./repository";
 
 class UserUseCase {

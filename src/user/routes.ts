@@ -5,10 +5,9 @@ import { UserUseCase } from "./usecase";
 export async function userRoutes(fastify: FastifyInstance) {
     const userUseCase = new UserUseCase()
 
-    // POST
     fastify.post<{ Body: UserCreate }>('/', async (req, reply) => {
-
       const{email, name, password} = req.body;
+      
       try {
         await userUseCase.create({email, name, password});
         reply.status(200).send("Sucesso ao Criar Usuario")
@@ -19,7 +18,6 @@ export async function userRoutes(fastify: FastifyInstance) {
       }
     );
 
-  // GET
   fastify.get('/', async (req, reply) => {
     try {
         const users = await userUseCase.get();
@@ -29,7 +27,6 @@ export async function userRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // PUT
   fastify.put<{ Params: { email: string }; Body: UserUpdate }>('/:email',  
   async (req: FastifyRequest<{ Params: { email: string }; Body: UserUpdate }>, reply) => {
     const email = req.params.email;
@@ -43,7 +40,6 @@ export async function userRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // DELETE
   fastify.delete<{ Params: { email: string } }>('/:email', async (req, reply) => {
     const email = req.params.email;
 
