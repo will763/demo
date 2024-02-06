@@ -1,6 +1,7 @@
 import { prisma } from "../database/prisma-client";
 import { User, UserCreate, UserRepository, UserUpdate } from "./interface";
 
+
 class UserRepositoryPrisma implements UserRepository{
     
     async create(data: UserCreate): Promise<String> {
@@ -10,10 +11,9 @@ class UserRepositoryPrisma implements UserRepository{
                 name: data.name,
                 password: data.password
             }
-
         })
 
-        return "result";
+        return "";
     }
     
     
@@ -24,16 +24,48 @@ class UserRepositoryPrisma implements UserRepository{
 
         return result
     }
+    
 
+    async get(): Promise<User[]> {
+        const results = await prisma.user.findMany({
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            password: true,
+          },
+        });
+      
+        const filteredResults = results
+          .filter(user => user.name !== null)
+          .map(user => ({
+            id: user.id,
+            email: user.email,
+            name: user.name as string,
+            password: user.password as string,
+          }));
+      
+        return filteredResults;
+      }
+      
+     
+    async update(email: string, data: UserUpdate): Promise<User> {
+        const result = await prisma.user.update({
+        where: { email },
+        data: {
+            password: data.password,
+        },
+        }) as User
+    
+        return result;
+    }
 
-    get(): Promise<User[]> {
-        throw new Error("Method not implemented.");
-    }
-    update(id: string, data: UserUpdate): Promise<User> {
-        throw new Error("Method not implemented.");
-    }
-    delete(id: string): Promise<User> {
-        throw new Error("Method not implemented.");
+    async delete(email: string): Promise<User> {
+        const result = await prisma.user.delete({
+            where: { email },
+        });
+    
+        return result as User;
     }
 }
 

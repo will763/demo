@@ -21,7 +21,9 @@ export interface User {
     create(data: UserCreate):Promise<String>;
     findByEmail(email: string ): Promise<User | null>;
     
-    get(): Promise<Array<User>>;
-    delete(id: string ): Promise<User>;
+    get(): Promise<User[]>;
+
     update(id: string, data: UserUpdate): Promise<User>;
+
+    delete(id: string ): Promise<User>;
   }
