@@ -20,7 +20,14 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@fastify/cookie": "^9.3.1",
+    "@fastify/cors": "^9.0.1",
     "@prisma/client": "^5.9.1",
-    "fastify": "^4.26.0"
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.5",
+    "bcrypt": "^5.1.1",
+    "fastify": "^4.26.0",
+    "fastify-cookie": "^5.7.0",
+    "jsonwebtoken": "^9.0.2"
   }
 }

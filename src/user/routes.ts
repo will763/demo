@@ -14,14 +14,16 @@ export async function userRoutes(fastify: FastifyInstance) {
         reply.status(200).send("Sucesso ao Criar Usuario")
         
       } catch (error) {
-          reply.status(400).send({error: "Request Ruim"});
+          reply.status(400).send({error: "Algo deu errado"});
+        }
       }
-    }
-  );
+    );
 
     // GET
     fastify.get('/', async (req, reply) => {
+      reply.send(req.url)
       
     }
   );
+   
 }

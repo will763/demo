@@ -1,5 +1,6 @@
 import { UserCreate, UserRepository, UserUpdate } from "./interface";
 import { UserRepositoryPrisma } from "./repository";
+import bcrypt from "bcrypt"
 
 
 class UserUseCase {
@@ -9,18 +10,14 @@ class UserUseCase {
     }
   
     async create(data: UserCreate) {
-      const verifyUserExists = await this.userRepository.findByEmail(data.email)
-      if (verifyUserExists) {
-        throw new Error("User ja existe")
-      }
-      
       await this.userRepository.create(data)
-
     }
-  
-
 
     async findAll() {
+    }
+
+    async findByEmail(email:string) {
+      return await this.userRepository.findByEmail(email)
     }
 
     async update(id:string, data: UserUpdate) {
