@@ -3,20 +3,22 @@ import jwt from "jsonwebtoken"
 
 export async function validAuthToken(req: FastifyRequest, reply: FastifyReply) {
     try {
-      const token = req.cookies.access_token
+      const authHeader = req.headers.authorization;
 
-      if (!token) {
+      if (!authHeader) {
         return reply.status(401).send({ message: 'Você não está autenticado' })
       }
 
-      const verified = jwt.verify(token, process.env.JWT_SECRET as string);
+      const [bearer, token] = authHeader.split(' ');
 
-      if (!verified){
-       return reply.status(401).send({ message: 'Verificação do token falhou, autorização negada.'});
+      if (bearer != "Bearer") {
+        return reply.status(401).send({ message: 'Verificação do token falhou, token mal formatado' })
       }
-        
+     
+      const verified = jwt.verify(token, process.env.JWT_SECRET as string);
+            
     } catch (error) {
-        reply.status(503).send({error: error})
+        reply.status(503).send({"Verificação do token falhou": error})
     }
 
 }

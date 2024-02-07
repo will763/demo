@@ -1,6 +1,6 @@
 import fastify, { FastifyInstance } from "fastify"
 import cookie from '@fastify/cookie'
-import { userRoutes } from "./user/routes";
+import { loginRoutes } from "./login/routes";
 import { authRoutes } from "./auth/routes";
 import { validAuthToken } from "./auth/middleware";
 import cors from '@fastify/cors'
@@ -16,8 +16,8 @@ app.register(cookie, {
   hook: 'preHandler',
 })
 
-app.register(userRoutes, {
-    prefix: '/api/v1/users',
+app.register(loginRoutes, {
+    prefix: '/api/v1/logins',
   });
 
 app.register(authRoutes, {

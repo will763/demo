@@ -35,6 +35,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     });
 
     fastify.get('/logout', { preHandler: [app.authenticate] } , async (req, reply) => {
-      reply.redirect(301,'https://www.mozilla.org/pt-BR/')
+      reply.send("testando")
     })
+
   }
