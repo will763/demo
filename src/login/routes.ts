@@ -1,11 +1,12 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
-import { LoginCreate, LoginUpdate } from "./interface";
+import { LoginUpdate } from "./interface";
 import { LoginUseCase } from "./usecase";
+import { app } from "../server";
 
 export async function loginRoutes(fastify: FastifyInstance) {
   const loginUseCase = new LoginUseCase()
 
-  fastify.get('/', async (req, reply) => {
+  fastify.get('/',{ preHandler: [app.authenticate] }, async (req, reply) => {
     try {
         const loginList = await loginUseCase.get();
         reply.status(200).send(loginList);
@@ -14,10 +15,10 @@ export async function loginRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.put<{ Params: { email: string }; Body: LoginUpdate }>('/:email',  
-  async (req: FastifyRequest<{ Params: { email: string }; Body: LoginUpdate }>, reply) => {
-    const email = req.params.email;
-    const { password } = req.body;
+  fastify.put<{ Params: { email: string }; Body: LoginUpdate }>('/:email', { preHandler: [app.authenticate] }, 
+    async (req: FastifyRequest<{ Params: { email: string }; Body: LoginUpdate }>, reply) => {
+      const email = req.params.email;
+      const { password } = req.body;
 
     try {
       await loginUseCase.updatePassword(email, password);
@@ -27,15 +28,16 @@ export async function loginRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.delete<{ Params: { email: string } }>('/:email', async (req, reply) => {
-    const email = req.params.email;
+  fastify.delete<{ Params: { email: string } }>('/:email', { preHandler: [app.authenticate] },
+    async (req, reply) => {
+      const email = req.params.email;
 
-    try {
-      await loginUseCase.delete(email);
-      reply.status(200).send("Login deletado com sucesso");
-    } catch (error) {
-      reply.status(500).send({ error: "Erro ao deletar login" });
-    }
+      try {
+        await loginUseCase.delete(email);
+        reply.status(200).send("Login deletado com sucesso");
+      } catch (error) {
+        reply.status(500).send({ error: "Erro ao deletar login" });
+      }
   });
 
 }

@@ -4,6 +4,7 @@ import { LoginUseCase } from "../login/usecase";
 import { signin, signup } from "./interface";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import { validEmail } from "../utils/validation";
 
 class AuthUseCase {
   private readonly loginUseCase: LoginUseCase;
@@ -15,17 +16,20 @@ class AuthUseCase {
   }
   
   async signin({ email, password }: signin) {
-    const login = await this.loginRepository.findByEmail(email)
+    
+    validEmail(email);
+
+    const user = await this.loginRepository.findByEmail(email)
    
-    if (!login) {
+    if (!user) {
       throw new Error("Credenciais inválidas!")
     }
 
-    if(!await bcrypt.compare(password,login.password)){
+    if(!await bcrypt.compare(password,user.password)){
       throw new Error("Credenciais inválidas!")
     }
 
-    const token = jwt.sign({id:login.id},process.env.JWT_SECRET as string,{
+    const token = jwt.sign({id:user.id,email:user.email},`${process.env.JWT_SECRET}`,{
       expiresIn: '8h',
       algorithm:"HS256",
     });
@@ -36,6 +40,8 @@ class AuthUseCase {
 
   async signup({ email, password, name }: signup) {
     const login = await this.loginRepository.findByEmail(email)
+
+    validEmail(email);
    
     if (login) {
       throw new Error("Email ou nome inválido")

@@ -1,10 +1,11 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyRequest } from "fastify";
 import { signup, signin } from "./interface";
 import { AuthUseCase } from "./usecase";
-import { app } from "../server";
+import { MicrosoftAuthUseCase } from './provide/microsoft/usecase'
 
 export async function authRoutes(fastify: FastifyInstance) {
     const authUseCase = new AuthUseCase()
+    const microsoftAuthUseCase = new MicrosoftAuthUseCase()
     
     fastify.post<{ Body: signin }>('/signin', async (req, reply) => {
       const { email, password } = req.body;
@@ -17,7 +18,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           .send({access_token:token})
         
       } catch (error) {
-        reply.status(400).send("Error ao tentar realizar o login:  " + error);
+        reply.status(400).send(error);
       }
       
     });
@@ -29,13 +30,30 @@ export async function authRoutes(fastify: FastifyInstance) {
         await authUseCase.signup({email, password, name});
         
       } catch (error) {
-        reply.status(400).send("Error ao tentar criar usuário");
+        reply.status(400).send(error);
       }
       
     });
 
-    fastify.get('/logout', { preHandler: [app.authenticate] } , async (req, reply) => {
-      reply.send("testando")
+    fastify.get('/microsoft', async (req, reply) => {
+      try {
+        const response = await microsoftAuthUseCase.getCode();
+        reply.redirect(response)
+      } catch (error) {
+        reply.status(500).send("Erro ao efetuar login pela microsoft "+ error);
+      }
     })
 
-  }
+    fastify.get('/microsoft/redirect', async (req:FastifyRequest<{ Querystring: { code: string }}>, reply) => {  
+      try {
+        const token = await microsoftAuthUseCase.register(req.query.code)
+        reply
+          .status(200)
+          .send({access_token:token})
+      } catch(error){
+          reply.status(500).send("Erro ao efetuar login pela microsoft "+ error)
+      }   
+    
+    });
+
+}
