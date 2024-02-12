@@ -39,9 +39,9 @@ class AuthUseCase {
   }
 
   async signup({ email, password, name }: signup) {
-    const login = await this.loginRepository.findByEmail(email)
-
     validEmail(email);
+
+    const login = await this.loginRepository.findByEmail(email)
    
     if (login) {
       throw new Error("Email ou nome inválido")

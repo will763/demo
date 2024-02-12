@@ -35,25 +35,14 @@ export async function authRoutes(fastify: FastifyInstance) {
       
     });
 
-    fastify.get('/microsoft', async (req, reply) => {
+    fastify.post<{Body:{username: string, password: string}}>('/microsoft', async (req, reply) => {
       try {
-        const response = await microsoftAuthUseCase.getCode();
-        reply.redirect(response)
+        const { username, password } = req.body;
+        const response = await microsoftAuthUseCase.signin(username, password);
+        reply.send(response)
       } catch (error) {
         reply.status(500).send("Erro ao efetuar login pela microsoft "+ error);
       }
     })
-
-    fastify.get('/microsoft/redirect', async (req:FastifyRequest<{ Querystring: { code: string }}>, reply) => {  
-      try {
-        const token = await microsoftAuthUseCase.register(req.query.code)
-        reply
-          .status(200)
-          .send({access_token:token})
-      } catch(error){
-          reply.status(500).send("Erro ao efetuar login pela microsoft "+ error)
-      }   
-    
-    });
 
 }

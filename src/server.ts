@@ -29,8 +29,8 @@ app.decorate(
   validAuthToken
 )
 
-app.get('/', async (req, reply) => {
-  reply.send("hello world")
+app.get('/api', (req, reply) => {
+  reply.send('Hello World')
 })
 
 app.listen({
