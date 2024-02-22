@@ -9,6 +9,6 @@ declare module 'fastify' {
     ) => Promise<void>;
 
     interface FastifyInstance {
-        authenticate: Authenticate;
+        ensureAuthenticated: Authenticate
     }
 }

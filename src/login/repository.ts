@@ -1,72 +1,40 @@
-import { prisma } from "../database/prisma-client";
-import { Login, LoginCreate, LoginRepository, LoginUpdate } from "./interface";
+import { prisma } from "../database/prisma-client.js";
+import { CreateLoginWithUser, CreateLoginWithUserId, Login, LoginRepository } from "./interface.js";
 
-
-class LoginRepositoryPrisma implements LoginRepository{
-    
-    async create(data: LoginCreate): Promise<String> {
-        const result = await prisma.login.create({
+class LoginRepositoryPrisma implements LoginRepository {
+    async createLoginWithUserId(data: CreateLoginWithUserId): Promise<void> {
+        await prisma.login.create({
             data: {
                 email: data.email,
                 name: data.name,
-                password: data.password
+                password: data.password,
+                userId: data.userId
             }
         })
-
-        return "";
     }
-    
-    
+
+    async createLoginWithUser(data: CreateLoginWithUser): Promise<void> {
+        await prisma.login.create({
+            data: {
+                email: data.email,
+                name: data.name,
+                password: data.password,
+                user: {
+                    create: {
+                        email: data.email,
+                        name: data.name
+                    }
+                } 
+            }
+        })
+    }
+
     async findByEmail(email: string): Promise<Login | null> {
-        const result = await prisma.login.findFirst({
-            where:{email}
-        }) as Login  
-
-        return result
-    }
-    
-
-    async get(): Promise<Login[]> {
-        const results = await prisma.login.findMany({
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            password: true,
-          },
-        });
-      
-        const filteredResults = results
-          .filter(login => login.name !== null)
-          .map(login => ({
-            id: login.id,
-            email: login.email,
-            name: login.name as string,
-            password: login.password as string,
-          }));
-      
-        return filteredResults;
-      }
-      
-     
-    async update(email: string, data: LoginUpdate): Promise<Login> {
-        const result = await prisma.login.update({
-        where: { email },
-        data: {
-            password: data.password,
-        },
-        }) as Login
-    
-        return result;
+        return await prisma.login.findFirst({
+            where: { email }
+        })
     }
 
-    async delete(email: string): Promise<Login> {
-        const result = await prisma.login.delete({
-            where: { email },
-        });
-    
-        return result as Login;
-    }
 }
 
 export { LoginRepositoryPrisma };

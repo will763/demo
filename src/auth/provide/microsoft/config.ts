@@ -1,11 +1,47 @@
-import { PublicClientApplication,LogLevel } from '@azure/msal-node';
+import { IOIDCStrategyOptionWithRequest, IProfile, VerifyCallback } from "passport-azure-ad";
+import dotenv from 'dotenv'
+import { MicrosoftAuthUseCase } from "./usecase.js";
+dotenv.config()
 
-const config = {
-    auth: {
-        clientId: `${process.env.CLIENT_ID}`,
-        authority: `${process.env.AUTHORITY}`,
-        clientSecret: `${process.env.CLIENT_SECRET}`
-    }
+const idmetadata = `${process.env.CLOUD_INSTANCE}${process.env.AZURE_TENANT_ID}/.well-known/openid-configuration`;
+const clientId = `${process.env.AZURE_CLIENT_ID}`;
+const clientSecret = `${process.env.AZURE_CLIENT_SECRET}`;
+
+export const azureADConfig: IOIDCStrategyOptionWithRequest = {
+    identityMetadata: idmetadata,
+    clientID: clientId,
+    clientSecret: clientSecret,
+    responseType: 'code id_token',
+    responseMode: 'form_post',
+    redirectUrl: `${process.env.REDIRECT_URI}`,
+    allowHttpForRedirectUrl: true,
+    isB2C: false,
+    validateIssuer: false,
+    passReqToCallback: true,
+    useCookieInsteadOfSession: false,
+    scope: '',
+    loggingLevel: 'info',
 };
 
-export const pca = new PublicClientApplication(config);
+export const callbackFunction = async (req: any, iss: String, sub: String, profile: IProfile, accessToken: any, refreshToken: string, done: VerifyCallback) => {
+    const microsoftAuthUseCase = new MicrosoftAuthUseCase();
+    const user = {name:'', email:''};
+    
+    if (!profile.oid) {
+        return done(new Error("No oid found"), null);
+    }
+
+    if (!profile.displayName ) {
+        return done(new Error("No displayName found"), null);
+    }
+
+    if (!profile.upn) {
+        return done(new Error("No upn found"), null);
+    }
+
+    await microsoftAuthUseCase.registerUser(profile.displayName, profile.upn)
+    user.name = profile.displayName;
+    user.email = profile.upn;
+
+    return done(null, user);
+};

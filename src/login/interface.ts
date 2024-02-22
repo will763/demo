@@ -1,29 +1,29 @@
+import { UserCreate } from "../user/interface.js";
+
 export interface Login {
     id: number;
     email: string;
     name: string;
     password: string
-  }
+    userId: number
+}
 
-  export interface LoginCreate {
+export interface CreateLoginWithUser {
     email: string;
     name: string;
     password: string
-  }
+    user: UserCreate
+}
 
-  export interface LoginUpdate {
+export interface CreateLoginWithUserId {
     email: string;
     name: string;
     password: string
-  }
+    userId: number
+}
 
-  export interface LoginRepository {
-    create(data: LoginCreate):Promise<String>;
-    findByEmail(email: string ): Promise<Login | null>;
-    
-    get(): Promise<Login[]>;
-
-    update(id: string, data: LoginUpdate): Promise<Login>;
-
-    delete(id: string ): Promise<Login>;
-  }
+export interface LoginRepository {
+    createLoginWithUser(data: CreateLoginWithUser): Promise<void>
+    createLoginWithUserId(data: CreateLoginWithUserId): Promise<void>;
+    findByEmail(email: string): Promise<Login | null>;
+}

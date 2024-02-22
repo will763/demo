@@ -1,41 +1,65 @@
-import fastify, { FastifyInstance, FastifyRequest } from "fastify"
-import cookie from '@fastify/cookie'
-import { loginRoutes } from "./login/routes";
-import { authRoutes } from "./auth/routes";
-import { validAuthToken } from "./auth/middleware";
+import fastify, { FastifyInstance } from "fastify"
+import { UserRoutes } from "./user/routes.js";
+import { authRoutes } from "./auth/routes.js";
 import cors from '@fastify/cors'
+import { Authenticator } from "@fastify/passport";
+import fastifySecureSession from "@fastify/secure-session";
+import { OIDCStrategy } from "passport-azure-ad";
+import { azureADConfig, callbackFunction } from "./auth/provide/microsoft/config.js";
+import fastifyFormbody from '@fastify/formbody'
+import { ensureAuthenticated } from "./auth/middleware/ensureAuthenticated.js";
+import dotenv from 'dotenv'
+dotenv.config()
 
 export const app: FastifyInstance = fastify()
 
-app.register(cors, { 
-  origin: 'http://localhost:5173',
-  credentials: true
+const port = Number(process.env.PORT) || 3000;
+
+export const fastifyPassport = new Authenticator();
+
+app.register(fastifySecureSession, {
+  key: Buffer.from(`${process.env.SECRET_KEY}`),
+  cookie: {
+    path: '/',
+    maxAge: 100000
+  }
 })
 
-app.register(cookie, {
-  hook: 'preHandler',
+app.register(fastifyFormbody)
+app.register(fastifyPassport.initialize())
+app.register(fastifyPassport.secureSession())
+
+fastifyPassport.use(new OIDCStrategy(azureADConfig, callbackFunction));
+
+fastifyPassport.registerUserSerializer(async (user, request) => user);
+
+fastifyPassport.registerUserDeserializer(async (user, request) => user);
+
+app.register(cors, {
+  origin: '*'
 })
 
-app.register(loginRoutes ,{
-    prefix: '/api/v1/logins',
-  });
+app.register(UserRoutes, {
+  prefix: '/api/v1/users',
+});
 
 app.register(authRoutes, {
-    prefix: '/api/v1/auth',
-  });
+  prefix: '/api/v1/auth',
+});
 
 app.decorate(
-  'authenticate',
-  validAuthToken
+  'ensureAuthenticated',
+  ensureAuthenticated
 )
 
 app.get('/api', (req, reply) => {
-  reply.send('Hello World')
+  reply.send('Servidor está rodando!');
 })
 
-app.listen({
-    port:3001,
-    },
-    ()=> {
-    console.log("app is running on port 3001")
-  })
+app.listen({ port, host: '0.0.0.0' }, (err, address) => {
+  if (err) {
+    console.error(err);
+    process.exit(1);
+  }
+  console.log(`Servidor rodando em ${address}`);
+})

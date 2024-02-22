@@ -1,22 +1,22 @@
-import { LoginRepository } from "../login/interface";
-import { LoginRepositoryPrisma } from "../login/repository";
-import { LoginUseCase } from "../login/usecase";
-import { signin, signup } from "./interface";
+import { UserUseCase } from "../user/usecase.js";
+import { signin, signup } from "./interface.js";
 import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
-import { validEmail } from "../utils/validation";
+import { validEmail } from "../utils/validation.js";
+import { FastifyRequest } from "fastify";
+import { fastifyPassport } from "../server.js";
+import { LoginRepositoryPrisma } from "../login/repository.js";
+import { LoginRepository } from "../login/interface.js";
 
 class AuthUseCase {
-  private readonly loginUseCase: LoginUseCase;
+  private readonly userUseCase: UserUseCase;
   private readonly loginRepository: LoginRepository;
     
   constructor() {
-    this.loginUseCase = new LoginUseCase();
+    this.userUseCase = new UserUseCase();
     this.loginRepository = new LoginRepositoryPrisma();
   }
   
-  async signin({ email, password }: signin) {
-    
+  async signin({ email, password }: signin, req:FastifyRequest) {
     validEmail(email);
 
     const user = await this.loginRepository.findByEmail(email)
@@ -29,31 +29,33 @@ class AuthUseCase {
       throw new Error("Credenciais inválidas!")
     }
 
-    const token = jwt.sign({id:user.id,email:user.email},`${process.env.JWT_SECRET}`,{
-      expiresIn: '8h',
-      algorithm:"HS256",
-    });
-
-    return 'Bearer ' + token;
-
+    await fastifyPassport.sessionManager.logIn(req,user);
   }
 
   async signup({ email, password, name }: signup) {
     validEmail(email);
 
-    const login = await this.loginRepository.findByEmail(email)
-   
-    if (login) {
-      throw new Error("Email ou nome inválido")
+    const user = await this.userUseCase.findByEmail(email);
+    const hashedPassword = await bcrypt.hash(password, 12)
+
+    if (user) {
+      await this.loginRepository.createLoginWithUserId({
+        email,
+        name,
+        password: hashedPassword,
+        userId: user.id
+      })
+    } else {
+      await this.loginRepository.createLoginWithUser({
+        email,
+        name,
+        password: hashedPassword,
+        user: {
+          email,
+          name
+        }
+      })
     }
-
-    const hashedPassword = await bcrypt.hash(password,12)
-
-    this.loginUseCase.create({
-      email,
-      name,
-      password:hashedPassword
-    })
 
   }
 

@@ -9,17 +9,20 @@ datasource db {
 
 model Login {
   id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  password String?
+  email    String  @unique @db.VarChar(40)
+  name     String  @db.VarChar(50)
+  password String  @db.VarChar(60)
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @unique
 
-  @@map("login")
+  @@map("tb_login")
 }
 
-model Microsoft_Login {
+model User {
   id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
+  email    String  @unique @db.VarChar(40)
+  name     String  @db.VarChar(50)
+  login Login?
 
-  @@map("microsoft_login")
+  @@map("tb_users")
 }

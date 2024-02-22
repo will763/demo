@@ -2,7 +2,7 @@
   "name": "backend-microservico-autenticacao",
   "version": "1.0.0",
   "description": "Backend do microservico de autenticacao",
-  "main": "index.js",
+  "main": "server.ts",
   "type": "module",
   "engines": {
     "node": "20.11.0"
@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/passport-azure-ad": "^4.3.6",
     "prisma": "^5.9.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
@@ -23,12 +24,17 @@
     "@azure/msal-node": "^2.6.2",
     "@fastify/cookie": "^9.3.1",
     "@fastify/cors": "^9.0.1",
+    "@fastify/formbody": "^7.4.0",
+    "@fastify/passport": "^2.4.0",
+    "@fastify/secure-session": "^7.1.0",
     "@prisma/client": "^5.9.1",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.5",
     "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
     "fastify": "^4.26.0",
     "fastify-cookie": "^5.7.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "passport-azure-ad": "^4.3.5"
   }
 }
