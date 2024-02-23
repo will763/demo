@@ -36,7 +36,8 @@ fastifyPassport.registerUserSerializer(async (user, request) => user);
 fastifyPassport.registerUserDeserializer(async (user, request) => user);
 
 app.register(cors, {
-  origin: '*'
+  origin: `${process.env.FRONTEND_URL}`,
+  credentials: true
 })
 
 app.register(UserRoutes, {

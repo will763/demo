@@ -31,21 +31,21 @@ export async function authRoutes(fastify: FastifyInstance) {
 
   });
 
-  fastify.get('/microsoft', fastifyPassport.authenticate('azuread-openidconnect'));
+  fastify.get('/microsoft', fastifyPassport.authenticate('azuread-openidconnect', { failureRedirect: '/api/v1/auth/auth-failure' }));
 
   fastify.post('/callback',
     { preValidation: fastifyPassport.authenticate('azuread-openidconnect', { failureRedirect: '/api/v1/auth/auth-failure' }) },
     (req, reply) => {
-      reply.redirect('http://localhost:5173')
+      reply.redirect(`${process.env.FRONTEND_URL}`)
     }
   )
 
-  fastify.get('/microsoft/logout', async (req: FastifyRequest, reply) => {
+  fastify.get('/logout', async (req: FastifyRequest, reply) => {
     try {
       await req.logOut();
       req.session.delete();
       if (req.session.deleted) {
-        reply.redirect(`${process.env.LOGOUT_REDIRECT_URI}`);
+        reply.redirect(`${process.env.FRONTEND_URL}`);
         return
       }
 
@@ -59,8 +59,8 @@ export async function authRoutes(fastify: FastifyInstance) {
     reply.send(req.user);
   });
 
-  fastify.get('/auth-failure', (req, reply) => {
+  fastify.get('/auth-failure', async (req, reply) => {
     reply.status(401).send({ message: 'Authentication failed' });
-  });
-
+  })
+  
 }

@@ -25,13 +25,13 @@ export const azureADConfig: IOIDCStrategyOptionWithRequest = {
 
 export const callbackFunction = async (req: any, iss: String, sub: String, profile: IProfile, accessToken: any, refreshToken: string, done: VerifyCallback) => {
     const microsoftAuthUseCase = new MicrosoftAuthUseCase();
-    const user = {name:'', email:''};
-    
+    const user = { name: '', email: '' };
+
     if (!profile.oid) {
         return done(new Error("No oid found"), null);
     }
 
-    if (!profile.displayName ) {
+    if (!profile.displayName) {
         return done(new Error("No displayName found"), null);
     }
 
@@ -39,9 +39,15 @@ export const callbackFunction = async (req: any, iss: String, sub: String, profi
         return done(new Error("No upn found"), null);
     }
 
-    await microsoftAuthUseCase.registerUser(profile.displayName, profile.upn)
-    user.name = profile.displayName;
-    user.email = profile.upn;
+    try {
+        await microsoftAuthUseCase.registerUser(profile.upn, profile.displayName)
+        user.name = profile.displayName;
+        user.email = profile.upn;
 
-    return done(null, user);
+        return done(null, user);
+    } catch (error) {
+        await req.logOut();
+        req.session.delete();
+        return done('Não fui possível registrar o usuário');
+    }
 };
