@@ -1,5 +1,4 @@
 import 'fastify';
-import { FastifyRequest, FastifyReply } from 'fastify';
 
 declare module 'fastify' {
 
@@ -9,6 +8,7 @@ declare module 'fastify' {
     ) => Promise<void>;
 
     interface FastifyInstance {
-        ensureAuthenticated: Authenticate
+        ensureAuthenticated: Authenticate,
+        setRedirectUrl: Authenticate
     }
 }

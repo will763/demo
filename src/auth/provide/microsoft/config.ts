@@ -11,8 +11,8 @@ export const azureADConfig: IOIDCStrategyOptionWithRequest = {
     identityMetadata: idmetadata,
     clientID: clientId,
     clientSecret: clientSecret,
-    responseType: 'code id_token',
-    responseMode: 'form_post',
+    responseType: 'code',
+    responseMode: 'query',
     redirectUrl: `${process.env.REDIRECT_URI}`,
     allowHttpForRedirectUrl: true,
     isB2C: false,
@@ -48,6 +48,6 @@ export const callbackFunction = async (req: any, iss: String, sub: String, profi
     } catch (error) {
         await req.logOut();
         req.session.delete();
-        return done('Não fui possível registrar o usuário');
+        return done('Não fui possível registrar o usuário:' + error);
     }
 };

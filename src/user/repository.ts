@@ -17,6 +17,12 @@ class UserRepositoryPrisma implements UserRepository {
         })
     }
 
+    async findById(id: number): Promise<User | null> {
+        return await prisma.user.findFirst({
+            where: { id }
+        })
+    }
+
     async getAll(): Promise<User[]> {
         const results = await prisma.login.findMany({
             select: {
@@ -27,7 +33,7 @@ class UserRepositoryPrisma implements UserRepository {
         });
 
         const filteredResults = results
-            .filter((user:User) => user.name !== null)
+            .filter((user: User) => user.name !== null)
             .map(user => ({
                 id: user.id,
                 email: user.email,
@@ -38,19 +44,28 @@ class UserRepositoryPrisma implements UserRepository {
     }
 
 
-    async update(email: string, data: UserUpdate): Promise<User> {
+    async update(id: number, data: UserUpdate): Promise<User> {
         return await prisma.user.update({
-            where: { email },
+            where: { id },
             data: {
                 email: data.email,
-                name: data.name
+                name: data.name,
+                login: {
+                    update: {
+                        data: {
+                            email: data.email,
+                            name: data.name,
+                            password: data.password
+                        }
+                    }
+                }
             },
         })
     }
 
-    async delete(email: string): Promise<User> {
+    async delete(id: number): Promise<User> {
         return await prisma.user.delete({
-            where: { email },
+            where: { id },
         });
     }
 }

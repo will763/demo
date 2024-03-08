@@ -13,11 +13,12 @@ class UserUseCase {
     return userList.map(user => ({ name: user.name, email: user.email }));
   }
 
-  async update(email: string, data: UserUpdate): Promise<void> {
-    await this.verifyExistingUser(email);
-    await this.UserRepository.update(email, {
+  async update(id: number, data: UserUpdate): Promise<void> {
+    await this.verifyExistingUserByEmail(data.email);
+    await this.UserRepository.update(id, {
       email: data.email,
       name: data.name,
+      password: data.password
     });
   }
 
@@ -25,16 +26,24 @@ class UserUseCase {
     return await this.UserRepository.findByEmail(email)
   }
 
-  async delete(email: string): Promise<void> {
-    await this.verifyExistingUser(email);
-    await this.UserRepository.delete(email);
+  async delete(id: number): Promise<void> {
+    await this.verifyExistingUserById(id);
+    await this.UserRepository.delete(id);
   }
 
-  async verifyExistingUser(email: string) {
+  async verifyExistingUserById(id: number) {
+    const existingUser = await this.UserRepository.findById(id);
+
+    if (!existingUser) {
+      throw new Error("Não foi possível deletar usuário");
+    }
+  }
+
+  async verifyExistingUserByEmail(email: string) {
     const existingUser = await this.UserRepository.findByEmail(email);
 
     if (!existingUser) {
-      throw new Error("Usuário não encontrado");
+      throw new Error("Não foi possível concluir a operação");
     }
   }
 

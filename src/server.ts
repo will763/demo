@@ -1,4 +1,7 @@
 import fastify, { FastifyInstance } from "fastify"
+import rateLimit from "@fastify/rate-limit"
+import helmet from '@fastify/helmet'
+import compress from '@fastify/compress'
 import { UserRoutes } from "./user/routes.js";
 import { authRoutes } from "./auth/routes.js";
 import cors from '@fastify/cors'
@@ -6,9 +9,10 @@ import { Authenticator } from "@fastify/passport";
 import fastifySecureSession from "@fastify/secure-session";
 import { OIDCStrategy } from "passport-azure-ad";
 import { azureADConfig, callbackFunction } from "./auth/provide/microsoft/config.js";
-import fastifyFormbody from '@fastify/formbody'
 import { ensureAuthenticated } from "./auth/middleware/ensureAuthenticated.js";
 import dotenv from 'dotenv'
+import { setRedirectUrl } from "./auth/middleware/setRedirectUrl.js";
+
 dotenv.config()
 
 export const app: FastifyInstance = fastify()
@@ -17,15 +21,24 @@ const port = Number(process.env.PORT) || 3000;
 
 export const fastifyPassport = new Authenticator();
 
+await app.register(rateLimit, { global: true, max: 2, timeWindow: 1000 })
+
+app.setNotFoundHandler({
+  preHandler: app.rateLimit()
+}, function (request, reply) {
+  reply.code(404).send({ hello: 'world' })
+})
+
 app.register(fastifySecureSession, {
   key: Buffer.from(`${process.env.SECRET_KEY}`),
   cookie: {
     path: '/',
-    maxAge: 100000
+    httpOnly: true,
+    maxAge: 1000,
+    sameSite: 'strict'
   }
 })
 
-app.register(fastifyFormbody)
 app.register(fastifyPassport.initialize())
 app.register(fastifyPassport.secureSession())
 
@@ -35,8 +48,12 @@ fastifyPassport.registerUserSerializer(async (user, request) => user);
 
 fastifyPassport.registerUserDeserializer(async (user, request) => user);
 
+app.register(helmet, { global: true });
+
+await app.register(compress);
+
 app.register(cors, {
-  origin: `${process.env.FRONTEND_URL}`,
+  origin: [`${process.env.FRONTEND_URL}`, 'http://localhost:3004'],
   credentials: true
 })
 
@@ -51,6 +68,11 @@ app.register(authRoutes, {
 app.decorate(
   'ensureAuthenticated',
   ensureAuthenticated
+)
+
+app.decorate(
+  'setRedirectUrl',
+  setRedirectUrl
 )
 
 app.get('/api', (req, reply) => {
