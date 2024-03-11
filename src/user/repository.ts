@@ -24,7 +24,7 @@ class UserRepositoryPrisma implements UserRepository {
     }
 
     async getAll(): Promise<User[]> {
-        const results = await prisma.login.findMany({
+        const results = await prisma.user.findMany({
             select: {
                 id: true,
                 name: true,

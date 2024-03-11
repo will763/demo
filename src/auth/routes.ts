@@ -41,7 +41,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     ));
 
   fastify.get('/callback',
-    { preValidation: fastifyPassport.authenticate('azuread-openidconnect', { failureRedirect: '/api/v1/auth/auth-failure' }) },
+    { preValidation: fastifyPassport.authenticate('azuread-openidconnect') },
     (req, reply) => {
 
       const { redirect_url_frontend } = req.cookies
@@ -75,7 +75,11 @@ export async function authRoutes(fastify: FastifyInstance) {
   });
 
   fastify.get('/account', { preHandler: [app.ensureAuthenticated] }, async (req, reply) => {
-    reply.send(req.user);
+    const token = reply.generateCsrf();
+    reply.send({
+      ...req.user,
+      token: token
+    });
   });
 
   fastify.get('/auth-failure', async (req, reply) => {
