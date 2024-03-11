@@ -13,6 +13,7 @@ export async function setRedirectUrl(req: FastifyRequest, reply: FastifyReply) {
         path:'/',
         httpOnly:true,
         secure:true,
-        sameSite:'none'
+        sameSite:'none',
+        partitioned: true
     })
 };

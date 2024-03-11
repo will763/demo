@@ -38,7 +38,8 @@ app.register(fastifySecureSession, {
     path: '/',
     httpOnly: true,
     secure: true,
-    sameSite:'none'
+    sameSite:'none',
+    partitioned: true
   }
 })
 
