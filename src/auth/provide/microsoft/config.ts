@@ -40,7 +40,7 @@ export const callbackFunction = async (req: any, iss: String, sub: String, profi
     }
 
     try {
-        await microsoftAuthUseCase.registerUser(profile.upn, profile.displayName)
+        //await microsoftAuthUseCase.registerUser(profile.upn, profile.displayName)
         user.name = profile.displayName;
         user.email = profile.upn;
 

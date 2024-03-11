@@ -1,5 +1,6 @@
 import fastify, { FastifyInstance } from "fastify"
 import rateLimit from "@fastify/rate-limit"
+import fastifyCsrf from "@fastify/csrf-protection"
 import helmet from '@fastify/helmet'
 import compress from '@fastify/compress'
 import { UserRoutes } from "./user/routes.js";
@@ -21,6 +22,8 @@ const port = Number(process.env.PORT) || 3000;
 
 export const fastifyPassport = new Authenticator();
 
+app.register(fastifyCsrf, { sessionPlugin: '@fastify/secure-session' })
+
 await app.register(rateLimit, { global: true, max: 2, timeWindow: 1000 })
 
 app.setNotFoundHandler({
@@ -34,8 +37,8 @@ app.register(fastifySecureSession, {
   cookie: {
     path: '/',
     httpOnly: true,
-    maxAge: 1000,
-    sameSite: 'strict'
+    secure: true,
+    sameSite:'none'
   }
 })
 
@@ -53,7 +56,7 @@ app.register(helmet, { global: true });
 await app.register(compress);
 
 app.register(cors, {
-  origin: [`${process.env.FRONTEND_URL}`, 'http://localhost:3004'],
+  origin: ['https://frontend-cyan-omega.vercel.app','http://localhost:3004'],
   credentials: true
 })
 
