@@ -1,6 +1,10 @@
 # Microservico de Autenticacao
 
+Esse autenticador serve para autenticar usuários por meio de provedores, como google, azure ID, GitHub. No dado momento, o único configurado é o azure ID.
+
 ### Como Rodar em Sua Máquina
+
+observacao:* para testar localmente, use o frontend de teste que usa esse backend como autenticador e que se encontra nesse diretorio [https://github.com/Sysmap-Sustentacao](https://github.com/Sysmap-Sustentacao/frontend-microservico-autenticacao). Certifique-se que ambos estao em execucao no momento do teste.
 
 Para rodar este projeto em sua máquina, siga estas etapas:
 
