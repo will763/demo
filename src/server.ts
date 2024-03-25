@@ -17,7 +17,7 @@ export const app: FastifyInstance = fastify()
 const port = Number(process.env.PORT) || 3000;
 
 app.register(import('@fastify/cookie'), {
-  secret: Buffer.from(`${process.env.SECRET_KEY}`)
+  secret: Buffer.from(`MT╗²¹9*3£╩¤8îÇó@ð`)
 })
 
 await app.register(rateLimit, { global: true, max: 2, timeWindow: 1000 })
