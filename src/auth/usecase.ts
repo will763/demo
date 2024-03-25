@@ -3,7 +3,6 @@ import { signin, signup } from "./interface.js";
 import bcrypt from "bcrypt"
 import { validEmail } from "../utils/validation.js";
 import { FastifyRequest } from "fastify";
-import { fastifyPassport } from "../server.js";
 import { LoginRepositoryPrisma } from "../login/repository.js";
 import { LoginRepository } from "../login/interface.js";
 
@@ -28,8 +27,7 @@ class AuthUseCase {
     if(!await bcrypt.compare(password,user.password)){
       throw new Error("Credenciais inválidas!")
     }
-
-    await fastifyPassport.sessionManager.logIn(req,user);
+    
   }
 
   async signup({ email, password, name }: signup) {

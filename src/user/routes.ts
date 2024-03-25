@@ -21,7 +21,6 @@ export async function UserRoutes(fastify: FastifyInstance) {
   fastify.put<{ Params: { id: number }; Body: UserUpdate }>('/:id', {
     schema: updateUserValidation.schema,
     validatorCompiler: validatorCompiler,
-    onRequest:app.csrfProtection,
     preHandler: [app.ensureAuthenticated]
   },
     async (req, reply) => {
@@ -39,7 +38,6 @@ export async function UserRoutes(fastify: FastifyInstance) {
   fastify.delete<{ Params: { id: number } }>('/:id', {
     schema: deleteUserValidation.schema,
     validatorCompiler: validatorCompiler,
-    onRequest:app.csrfProtection,
     preHandler: [app.ensureAuthenticated]
   },
     async (req, reply) => {
