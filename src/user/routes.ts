@@ -2,14 +2,11 @@ import { FastifyInstance, FastifyRequest } from "fastify";
 import { app } from "../server.js";
 import { UserUseCase } from "./usecase.js";
 import { UserUpdate } from "./interface.js";
-import { deleteUserValidation } from "../validation/deleteUser/schema.js";
-import { validatorCompiler } from "../validation/validator.js";
-import { updateUserValidation } from "../validation/updateUser/schema.js";
 
 export async function UserRoutes(fastify: FastifyInstance) {
   const userUseCase = new UserUseCase()
 
-  fastify.get('/', { preHandler: [app.ensureAuthenticated] }, async (req, reply) => {
+  fastify.get('/', async (req, reply) => {
     try {
       const userList = await userUseCase.get();
       reply.status(200).send(userList);
@@ -18,11 +15,7 @@ export async function UserRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.put<{ Params: { id: number }; Body: UserUpdate }>('/:id', {
-    schema: updateUserValidation.schema,
-    validatorCompiler: validatorCompiler,
-    preHandler: [app.ensureAuthenticated]
-  },
+  fastify.put<{ Params: { id: number }; Body: UserUpdate }>('/:id',
     async (req, reply) => {
       try {
         const { id } = req.params;
@@ -35,11 +28,7 @@ export async function UserRoutes(fastify: FastifyInstance) {
       }
     });
 
-  fastify.delete<{ Params: { id: number } }>('/:id', {
-    schema: deleteUserValidation.schema,
-    validatorCompiler: validatorCompiler,
-    preHandler: [app.ensureAuthenticated]
-  },
+  fastify.delete<{ Params: { id: number } }>('/:id',
     async (req, reply) => {
       try {
         const { id } = req.params;

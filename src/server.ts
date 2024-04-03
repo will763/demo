@@ -4,9 +4,7 @@ import helmet from '@fastify/helmet'
 import compress from '@fastify/compress'
 import { UserRoutes } from "./user/routes.js";
 import cors from '@fastify/cors'
-import { ensureAuthenticated } from "./auth/middleware/ensureAuthenticated.js";
 import dotenv from 'dotenv'
-import { setRedirectUrl } from "./auth/middleware/setRedirectUrl.js";
 import { authRoutesMicrosoft } from "./auth/provide/microsoft/routes.js";
 
 dotenv.config()
@@ -43,16 +41,6 @@ app.register(UserRoutes, {
 app.register(authRoutesMicrosoft, {
   prefix: '/api/v1/auth',
 });
-
-app.decorate(
-  'ensureAuthenticated',
-  ensureAuthenticated
-)
-
-app.decorate(
-  'setRedirectUrl',
-  setRedirectUrl
-)
 
 app.get('/api', (req, reply) => {
   reply.send('Servidor está rodando!');
