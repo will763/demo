@@ -3,7 +3,6 @@ import rateLimit from "@fastify/rate-limit"
 import helmet from '@fastify/helmet'
 import compress from '@fastify/compress'
 import { UserRoutes } from "./user/routes.js";
-import { authRoutes } from "./auth/routes.js";
 import cors from '@fastify/cors'
 import { ensureAuthenticated } from "./auth/middleware/ensureAuthenticated.js";
 import dotenv from 'dotenv'
@@ -39,10 +38,6 @@ app.register(cors, {
 
 app.register(UserRoutes, {
   prefix: '/api/v1/users',
-});
-
-app.register(authRoutes, {
-  prefix: '/api/v1/auth',
 });
 
 app.register(authRoutesMicrosoft, {
