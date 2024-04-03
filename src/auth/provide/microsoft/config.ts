@@ -1,4 +1,6 @@
-import { Configuration, PublicClientApplication, ConfidentialClientApplication } from "@azure/msal-node";
+import { Configuration, ConfidentialClientApplication } from "@azure/msal-node";
+import dotenv from 'dotenv'
+dotenv.config()
 
 const config: Configuration = {
   auth: {

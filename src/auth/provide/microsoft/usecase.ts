@@ -1,5 +1,7 @@
 import { pca } from "./config.js";
+import dotenv from 'dotenv'
 import crypto, { createHash } from "crypto";
+dotenv.config()
 
 class MicrosoftAuthUseCase {
   private _codeVerifier: string | undefined;

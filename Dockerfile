@@ -12,6 +12,5 @@ WORKDIR /app
 COPY --from=builder ./app/dist ./dist
 COPY package.json .
 COPY package-lock.json .
-COPY ./prisma ./prisma
 RUN npm install --production
 CMD [ "npm", "run", "start" ]

@@ -2,7 +2,6 @@ import fastify, { FastifyInstance } from "fastify"
 import rateLimit from "@fastify/rate-limit"
 import helmet from '@fastify/helmet'
 import compress from '@fastify/compress'
-import { UserRoutes } from "./user/routes.js";
 import cors from '@fastify/cors'
 import dotenv from 'dotenv'
 import { authRoutesMicrosoft } from "./auth/provide/microsoft/routes.js";
@@ -14,7 +13,7 @@ export const app: FastifyInstance = fastify()
 const port = Number(process.env.PORT) || 3000;
 
 app.register(import('@fastify/cookie'), {
-  secret: Buffer.from(`MT╗²¹9*3£╩¤8îÇó@ð`)
+  secret: Buffer.from(`${process.env.SECRET_KEY}`)
 })
 
 await app.register(rateLimit, { global: true, max: 2, timeWindow: 1000 })
@@ -31,15 +30,10 @@ await app.register(compress);
 
 app.register(cors, {
   origin: ['https://frontend-cyan-omega.vercel.app','http://localhost:3004'],
-  credentials: true
 })
 
-app.register(UserRoutes, {
-  prefix: '/api/v1/users',
-});
-
 app.register(authRoutesMicrosoft, {
-  prefix: '/api/v1/auth',
+  prefix: '/api/v1/auth'
 });
 
 app.get('/api', (req, reply) => {
