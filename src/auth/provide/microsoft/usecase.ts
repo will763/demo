@@ -1,5 +1,3 @@
-import { validEmail } from "../../../utils/validation.js";
-import { prisma } from "../../../database/prisma-client.js";
 import { pca } from "./config.js";
 import crypto, { createHash } from "crypto";
 
@@ -44,25 +42,6 @@ class MicrosoftAuthUseCase {
     }
 
     throw new Error('Informações sobre o usuário não foram encontradas');
-  }
-
-  async registerUser(email: string, name: string) {
-
-    validEmail(email);
-
-    const user = await prisma.user.findUnique({
-      where: { email }
-    })
-
-    if (!user) {
-      await prisma.user.create({
-        data: {
-          name,
-          email
-        }
-      });
-    }
-
   }
 
 }
