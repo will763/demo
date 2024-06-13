@@ -42,3 +42,49 @@ npm run dev
 ```
 6. Abra seu navegador e acesse a aplicação em:
 http://localhost:3000/api
+
+### Como usar com React
+Embora o exemplo utilize ReactJS, o Autenticador pode ser integrado com outros frameworks seguindo a mesma lógica descrita abaixo.
+
+1. Defina uma button para disparar a função que chama o Autenticador.
+```jsx
+<button onClick={() => handleClick()}>Entrar</button>
+```
+2. Definindo a função handleClick.
+```js
+  const handleClick = () => {
+    const redirect_url = window.location.href;
+    window.location.href = `http://localhost:3000/api/v1/auth/microsoft?redirect_url=${redirect_url}`
+  }
+```
+3. Obter os dados do Usuário.
+Após o login ser realizado com sucesso, os dados são retornados para a página. A função a seguir é responsável por capturar esses dados.
+```js
+  function signIn(url:string) {
+    const urlObj = new URL(url);
+    const params = new URLSearchParams(urlObj.search);
+
+    const name = params.get('name');
+    const email = params.get('email');
+
+    if(name && email){
+      setUserLogged({
+        displayName: name,
+        email
+      })
+    }
+
+    urlObj.search = '';
+
+    const cleanUrl = `${urlObj.origin}${urlObj.pathname}`;
+    window.history.pushState({}, document.title, cleanUrl);
+  }
+```
+Você pode salvar os dados em um estado global, sessionStorage, localStorage ou outro meio de persistência.
+Execute essa função no momento da inicialização do componente para pegar os dados retornados após o login.
+```js
+  useEffect(() => {
+    signIn(window.location.href)
+  }, [])
+```
+Lembre-se, o código acima deve estar na página de retorno do Autententicador ou ficar escutando o processo de login.
