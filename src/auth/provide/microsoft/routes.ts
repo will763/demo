@@ -19,16 +19,12 @@ export async function authRoutesMicrosoft(fastify: FastifyInstance) {
     fastify.get<{ Querystring: { code: string } }>('/callback', async (req, reply) => {
         try {
             const { code } = req.query;
-            const { user, redirect_url } = await microsoftAuthUsecase.getUserdetails(code) ?? "";
-
-            const expireTime = new Date(Date.now() + 30000);
-            reply.setCookie('sysmap-authentication', user, {
-                path: '/',
-                secure: false,
-                httpOnly: false,
-                expires: expireTime,
-            });
-            reply.redirect(redirect_url);
+            const { email, name, redirect_url } = await microsoftAuthUsecase.getUserdetails(code) ?? "";
+            
+            const params = new URLSearchParams({ name, email });
+            const url = redirect_url + "?" + params.toString();
+            
+            reply.redirect(url);
         } catch (error) {
             console.error(error);
             reply.send(error);
