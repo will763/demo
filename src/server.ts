@@ -12,16 +12,12 @@ export const app: FastifyInstance = fastify()
 
 const port = Number(process.env.PORT) || 3000;
 
-app.register(import('@fastify/cookie'), {
-  secret: Buffer.from(`${process.env.SECRET_KEY}`)
-})
-
 await app.register(rateLimit, { global: true, max: 2, timeWindow: 1000 })
 
 app.setNotFoundHandler({
   preHandler: app.rateLimit()
 }, function (request, reply) {
-  reply.code(404).send({ hello: 'world' })
+  reply.code(404).send({ message: 'Servidor está rodando!' })
 })
 
 app.register(helmet, { global: true });
@@ -29,7 +25,7 @@ app.register(helmet, { global: true });
 await app.register(compress);
 
 app.register(cors, {
-  origin: ['https://frontend-cyan-omega.vercel.app','http://localhost:3004'],
+  origin: '*',
 })
 
 app.register(authRoutesMicrosoft, {
