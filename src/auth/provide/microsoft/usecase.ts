@@ -36,10 +36,8 @@ class MicrosoftAuthUseCase {
     if(tokenResponse.account?.username && tokenResponse.account.name && this._redirect_url ){
       return {
         redirect_url: this._redirect_url,
-        user: JSON.stringify({
-          name: tokenResponse.account.name,
-          email: tokenResponse.account?.username
-        })
+        name: tokenResponse.account.name,
+        email: tokenResponse.account.username
       }
     }
 
